@@ -1,0 +1,13 @@
+{
+  "name": "asynchronous-programming",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "excercise-1": "node src/tracking_scalpel.js",
+    "excercise-2": "node src/promise_all.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
