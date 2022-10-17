@@ -1,6 +1,7 @@
 declare var require: any;
-import { string } from "fp-ts";
-import * as T from "fp-ts/lib/Task";
+import { pipe } from "fp-ts/lib/function";
+import * as TE from "fp-ts/lib/TaskEither";
+import * as E from "fp-ts/lib/Either";
 
 const bigOak = require("./crow_tech").bigOak;
 const defineRequestType = require("./crow_tech").defineRequestType;
@@ -133,12 +134,29 @@ function anyStorage(nest, source, name) {
 
 function locateScalpel(nest: { name: string }) {
   function trackScalpel(current: string) {
-    return T.of(anyStorage(nest, current, "scalpel"))().then((next: any) => {
-      if (next == current) return current;
-      else return trackScalpel(next);
-    });
+    return TE.tryCatch<Error, string>(
+      () =>
+        anyStorage(nest, current, "scalpel")
+          .then((next: any) => {
+            if (next == current) return current;
+            else return trackScalpel(next);
+          })
+          .catch((err) => Promise.reject(err)),
+      (reason) => new Error(`${reason}`)
+    )();
   }
   return trackScalpel(nest.name);
 }
 
-locateScalpel(bigOak).then(console.log);
+locateScalpel(bigOak)
+  .then((e: any) =>
+    pipe(
+      e,
+      E.fold(
+        (err: Error) => `${err.message}`,
+        (result: any) => result
+      ),
+      E.flatten
+    )
+  )
+  .then(console.log);
