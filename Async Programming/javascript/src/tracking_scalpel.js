@@ -144,7 +144,6 @@ async function locateScalpel(nest) {
 }
 
 function locateScalpel2(nest) {
-  let currentNest = nest.name;
   function trackScalpel(currentNest) {
     try {
       return anyStorage(nest, currentNest, "scalpel").then((nextNest) => {
@@ -159,7 +158,7 @@ function locateScalpel2(nest) {
     }
   }
 
-  return trackScalpel(currentNest);
+  return trackScalpel(nest.name);
 }
 
 locateScalpel(bigOak).then(console.log);

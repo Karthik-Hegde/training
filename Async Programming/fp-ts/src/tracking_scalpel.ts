@@ -131,14 +131,14 @@ function anyStorage(nest, source, name) {
   else return routeRequest(nest, source, "storage", name);
 }
 
-async function locateScalpel(nest: { name: string }) {
-  function loop(current: string) {
+function locateScalpel(nest: { name: string }) {
+  function trackScalpel(current: string) {
     return T.of(anyStorage(nest, current, "scalpel"))().then((next: any) => {
       if (next == current) return current;
-      else return loop(next);
+      else return trackScalpel(next);
     });
   }
-  return loop(nest.name);
+  return trackScalpel(nest.name);
 }
 
 locateScalpel(bigOak).then(console.log);
