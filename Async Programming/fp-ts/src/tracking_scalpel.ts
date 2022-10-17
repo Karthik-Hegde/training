@@ -1,4 +1,5 @@
 declare var require: any;
+import { string } from "fp-ts";
 import * as T from "fp-ts/lib/Task";
 
 const bigOak = require("./crow_tech").bigOak;
@@ -130,20 +131,14 @@ function anyStorage(nest, source, name) {
   else return routeRequest(nest, source, "storage", name);
 }
 
-async function locateScalpel(nest: any) {
-  let currentNest: string | undefined = nest.name;
-  let nextNest: string | undefined;
-
-  while (true) {
-    const getLocationStorageTask: T.Task<string | undefined> = () =>
-      anyStorage(nest, currentNest, "scalpel") as Promise<string | undefined>;
-    nextNest = await getLocationStorageTask();
-    if (nextNest === currentNest) {
-      return currentNest;
-    } else {
-      currentNest = nextNest;
-    }
+async function locateScalpel(nest: { name: string }) {
+  function loop(current: string) {
+    return T.of(anyStorage(nest, current, "scalpel"))().then((next: any) => {
+      if (next == current) return current;
+      else return loop(next);
+    });
   }
+  return loop(nest.name);
 }
 
 locateScalpel(bigOak).then(console.log);
